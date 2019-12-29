@@ -5,11 +5,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace MvcExtensions
+namespace Mvc.Extensions
 {
     public static class EnumExtensions
     {        
-        public static IEnumerable<SelectListItem> ToSelectList(this Type enumType, SelectListOptions options = null)
+        public static SelectList ToSelectList(this Type enumType, SelectListOptions options = null)
         {
             if (options == null)
                 options = new SelectListOptions();
@@ -35,7 +35,35 @@ namespace MvcExtensions
                 selectList.Add(item);                
             }
 
-            return selectList;
+            return new SelectList(selectList);
+        }
+
+        public static string GetDisplayName(this Enum value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            DisplayNameAttribute[] attributes = fi.GetCustomAttributes(typeof(DisplayNameAttribute), false) as DisplayNameAttribute[];
+
+            if (attributes != null && attributes.Any())
+            {
+                return attributes.First().DisplayName;
+            }
+
+            return value.ToString();
+        }
+
+        public static string GetCategoryName(this Enum value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            CategoryAttribute[] attributes = fi.GetCustomAttributes(typeof(CategoryAttribute), false) as CategoryAttribute[];
+
+            if (attributes != null && attributes.Any())
+            {
+                return attributes.First().Category;
+            }
+
+            return "";
         }
 
         private static IEnumerable<SelectListGroup> GetCategories(this Type enumType, string[] DisabledGroups)
@@ -59,36 +87,9 @@ namespace MvcExtensions
             }           
 
             return categories;
-        }
-
-        public static string GetCategoryName(this Enum value)
-        {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
-
-            CategoryAttribute[] attributes = fi.GetCustomAttributes(typeof(CategoryAttribute), false) as CategoryAttribute[];
-
-            if (attributes != null && attributes.Any())
-            {
-                return attributes.First().Category;
-            }
-
-            return "";
-        }
-
-        public static string GetDisplayName(this Enum value)
-        {
-            FieldInfo fi = value.GetType().GetField(value.ToString());
-
-            DisplayNameAttribute[] attributes = fi.GetCustomAttributes(typeof(DisplayNameAttribute), false) as DisplayNameAttribute[];
-
-            if (attributes != null && attributes.Any())
-            {
-                return attributes.First().DisplayName;
-            }
-
-            return value.ToString();
-        }        
+        }              
     }
+
     public class SelectListOptions
     {
         public SelectListOptions()
