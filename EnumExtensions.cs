@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-namespace WebUiMvc.Helpers
+namespace MvcExtensions
 {
     public static class EnumExtensions
     {        
@@ -27,8 +27,9 @@ namespace WebUiMvc.Helpers
                 bool selected = (options.SelectedValues.Any(v => v == value));
                 bool disabled = (options.DisabledValues.Any(v => v == value));
                 var group = categories.FirstOrDefault(c => c.Name == ((Enum)value).GetCategoryName());
+                string listValues = options.IsStringValue ? ((Enum)value).ToString() : ((int)value).ToString();
 
-                var item = new SelectListItem(((Enum)value).GetDisplayName(), ((int)value).ToString(), selected, disabled);
+                var item = new SelectListItem(((Enum)value).GetDisplayName(), listValues, selected, disabled);
                 item.Group = group;
 
                 selectList.Add(item);                
@@ -88,7 +89,6 @@ namespace WebUiMvc.Helpers
             return value.ToString();
         }        
     }
-    
     public class SelectListOptions
     {
         public SelectListOptions()
@@ -102,5 +102,6 @@ namespace WebUiMvc.Helpers
         public object[] DisabledValues { get; set; }
         public string[] DisabledGroups { get; set; }
         public string Placeholder { get; set; }
+        public bool IsStringValue { get; set; }
     }
 }
